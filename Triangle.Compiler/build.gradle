@@ -18,5 +18,6 @@ application {
 	mainClass = 'Triangle.Compiler'
 }
 
+
 // allow access to programs for unit tests
 sourceSets.test.resources.srcDir file("$rootDir/programs")
