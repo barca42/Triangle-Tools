@@ -335,6 +335,11 @@ public class Interpreter {
 			accumulator = data[ST - 1];
 			data[ST - 1] = overflowChecked(accumulator * data[ST]);
 			break;
+
+			//maybe add BAR here??
+			//case BAR:
+				//ST=
+
 		case DIV:
 			ST = ST - 1;
 			accumulator = data[ST - 1];

@@ -108,6 +108,7 @@ import triangle.codeGenerator.entities.KnownAddress;
 import triangle.codeGenerator.entities.KnownRoutine;
 import triangle.codeGenerator.entities.KnownValue;
 import triangle.codeGenerator.entities.PrimitiveRoutine;
+import triangle.codeGenerator.entities.BarPrimitiveRoutine;
 import triangle.codeGenerator.entities.RoutineEntity;
 import triangle.codeGenerator.entities.RuntimeEntity;
 import triangle.codeGenerator.entities.TypeRepresentation;
@@ -184,6 +185,10 @@ public final class Encoder implements ActualParameterVisitor<Frame, Integer>,
 
 	@Override
 	public Void visitRepeatCommand(RepeatCommand ast, Frame frame) {
+		var loopAddr = emitter.getNextInstrAddr();
+		ast.C.visit(this, frame);
+		ast.E.visit(this, frame);
+		emitter.emit(OpCode.JUMPIF, Machine.falseRep, Register.CB, loopAddr);
 		return null;
 	}
 
@@ -706,6 +711,11 @@ public final class Encoder implements ActualParameterVisitor<Frame, Integer>,
 		writeTableDetails(routineDeclaration);
 	}
 
+	private final void elaborateBarPrimRoutine(Declaration routineDeclaration){
+		routineDeclaration.entity = new BarPrimitiveRoutine();
+		writeTableDetails(routineDeclaration);
+	}
+
 	private final void elaborateStdEqRoutine(Declaration routineDeclaration, Primitive primitive) {
 		routineDeclaration.entity = new EqualityRoutine(Machine.closureSize, primitive);
 		writeTableDetails(routineDeclaration);
@@ -740,6 +750,7 @@ public final class Encoder implements ActualParameterVisitor<Frame, Integer>,
 		elaborateStdPrimRoutine(StdEnvironment.puteolDecl, Primitive.PUTEOL);
 		elaborateStdEqRoutine(StdEnvironment.equalDecl, Primitive.EQ);
 		elaborateStdEqRoutine(StdEnvironment.unequalDecl, Primitive.NE);
+		elaborateBarPrimRoutine(StdEnvironment.barDecl);
 	}
 
 	boolean tableDetailsReqd;
