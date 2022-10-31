@@ -35,18 +35,18 @@ import triangle.treeDrawer.Drawer;
  */
 public class Compiler {
 	/** The filename for the triangle program normally triangle.tri. */
-	@Argument(alias = "input file", description = "Triangle code file", required = true)
+	@Argument(alias = "input", description = "Triangle code file", required = true)
 	static String sourceName = "";
 
 	/** The filename for the object program, normally obj.tam. */
-	@Argument(alias = "output file", description = "The file where we parse binary code")
+	@Argument(alias = "output", description = "The file where we parse binary code")
 	static String objectName = "obj.tam";
 
-	@Argument(alias = "tree", description = "true if we want to see drawn AST")
+	@Argument(alias = "t", description = "tree, true if we want to see drawn AST")
 	static boolean showTree = false;
-	@Argument(alias = "folded tree", description = "true if we want to see the tree after folding")
+	@Argument(alias = "ft", description = "folded Tree, true if we want to see the tree after folding")
 	static boolean foldedTree = false;
-	@Argument(alias = "folding", description = "folds the AST")
+	@Argument(alias = "f", description = "folding, true if we want to fold the AST")
 	static boolean folding = false;
 
 	private static Scanner scanner;
@@ -141,8 +141,6 @@ public class Compiler {
 		}
 
 		Args.parseOrExit(Compiler.class, args);
-
-		String sourceName = args[0];
 		
 		var compiledOK = compileProgram(sourceName, objectName, showTree, false, foldedTree);
 
