@@ -14,6 +14,9 @@
 
 package triangle;
 
+import com.sampullara.cli.Args;
+import com.sampullara.cli.Argument;
+
 import triangle.abstractSyntaxTrees.Program;
 import triangle.codeGenerator.Emitter;
 import triangle.codeGenerator.Encoder;
@@ -31,11 +34,19 @@ import triangle.treeDrawer.Drawer;
  * @author Deryck F. Brown
  */
 public class Compiler {
+	/** The filename for the triangle program normally triangle.tri. */
+	@Argument(alias = "input file", description = "Triangle code file", required = true)
+	static String sourceName = "";
 
 	/** The filename for the object program, normally obj.tam. */
+	@Argument(alias = "output file", description = "The file where we parse binary code")
 	static String objectName = "obj.tam";
-	
+
+	@Argument(alias = "tree", description = "true if we want to see drawn AST")
 	static boolean showTree = false;
+	@Argument(alias = "folded tree", description = "true if we want to see the tree after folding")
+	static boolean foldedTree = false;
+	@Argument(alias = "folding", description = "folds the AST")
 	static boolean folding = false;
 
 	private static Scanner scanner;
@@ -54,15 +65,15 @@ public class Compiler {
 	 *
 	 * @param sourceName   the name of the file containing the source program.
 	 * @param objectName   the name of the file containing the object program.
-	 * @param showingAST   true iff the AST is to be displayed after contextual
+	 * @param showingAST   true if the AST is to be displayed after contextual
 	 *                     analysis
-	 * @param showingTable true iff the object description details are to be
+	 * @param showingTable true if the object description details are to be
 	 *                     displayed during code generation (not currently
 	 *                     implemented).
-	 * @return true iff the source program is free of compile-time errors, otherwise
+	 * @return true if the source program is free of compile-time errors, otherwise
 	 *         false.
 	 */
-	static boolean compileProgram(String sourceName, String objectName, boolean showingAST, boolean showingTable) {
+	static boolean compileProgram(String sourceName, String objectName, boolean showingAST, boolean showingTable, boolean foldedAST) {
 
 		System.out.println("********** " + "Triangle Compiler (Java Version 2.1)" + " **********");
 
@@ -90,13 +101,16 @@ public class Compiler {
 			// }
 			System.out.println("Contextual Analysis ...");
 			checker.check(theAST); // 2nd pass
-			if (showingAST) {
+			if (showingAST && !foldedAST) {
 				drawer.draw(theAST);
 			}
 			if (folding) {
 				theAST.visit(new ConstantFolder());
+				if (foldedAST) {
+					drawer.draw(theAST);
+				}
 			}
-			
+
 			if (reporter.getNumErrors() == 0) {
 				System.out.println("Code Generation ...");
 				encoder.encodeRun(theAST, showingTable); // 3rd pass
@@ -122,31 +136,18 @@ public class Compiler {
 	public static void main(String[] args) {
 
 		if (args.length < 1) {
-			System.out.println("Usage: tc filename [-o=outputfilename] [tree] [folding]");
+			System.out.println("Usage: filename, objectname, tree, folding, foldedtree");
 			System.exit(1);
 		}
-		
-		parseArgs(args);
+
+		Args.parseOrExit(Compiler.class, args);
 
 		String sourceName = args[0];
 		
-		var compiledOK = compileProgram(sourceName, objectName, showTree, false);
+		var compiledOK = compileProgram(sourceName, objectName, showTree, false, foldedTree);
 
 		if (!showTree) {
 			System.exit(compiledOK ? 0 : 1);
-		}
-	}
-	
-	private static void parseArgs(String[] args) {
-		for (String s : args) {
-			var sl = s.toLowerCase();
-			if (sl.equals("tree")) {
-				showTree = true;
-			} else if (sl.startsWith("-o=")) {
-				objectName = s.substring(3);
-			} else if (sl.equals("folding")) {
-				folding = true;
-			}
 		}
 	}
 }
