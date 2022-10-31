@@ -1,0 +1,31 @@
+let 
+ func sum (x : Integer, y : Integer) : Integer ~
+ 	(x+y);
+
+ func product (x : Integer, y : Integer) : Integer ~
+ 	(x*y);
+
+ proc equals (x : Integer, y : Integer) ~
+	if y=x
+	 then 
+	 	begin put('S');put('a');put('m');put('e') end
+	else;
+	
+ var a: Integer;
+ var b: Integer;
+ var c: Integer; 
+ var d: Integer
+
+in
+  begin
+  getint (var a);
+  getint (var b);
+  c:=sum(a,b);
+  putint(c);
+  puteol();
+  d:=product(a,b);
+  putint(d);
+  puteol();
+  equals(a,b)
+  end
+ 
