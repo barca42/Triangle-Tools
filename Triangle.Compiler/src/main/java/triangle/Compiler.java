@@ -26,6 +26,7 @@ import triangle.syntacticAnalyzer.Parser;
 import triangle.syntacticAnalyzer.Scanner;
 import triangle.syntacticAnalyzer.SourceFile;
 import triangle.treeDrawer.Drawer;
+import triangle.optimiser.Statistics;
 
 /**
  * The main driver class for the Triangle compiler.
@@ -42,12 +43,15 @@ public class Compiler {
 	@Argument(alias = "output", description = "The file where we parse binary code")
 	static String objectName = "obj.tam";
 
+
 	@Argument(alias = "t", description = "tree, true if we want to see drawn AST")
 	static boolean showTree = false;
 	@Argument(alias = "ft", description = "folded Tree, true if we want to see the tree after folding")
 	static boolean foldedTree = false;
 	@Argument(alias = "f", description = "folding, true if we want to fold the AST")
 	static boolean folding = false;
+	@Argument(alias = "s", description = "statistics to sum up IfCommands, WhileCommands and BinaryExpressions")
+	static boolean stats = false;
 
 	private static Scanner scanner;
 	private static Parser parser;
@@ -109,6 +113,17 @@ public class Compiler {
 				if (foldedAST) {
 					drawer.draw(theAST);
 				}
+			}
+
+			if (stats) {
+				Statistics statistics = new Statistics();
+				theAST.visit(statistics);
+				int binary = statistics.getBinaryExpressions();
+				int whileLoop = statistics.getWhileLoops();
+				int ifElse = statistics.getIfElse();
+				System.out.println("Binary Expressions: " + Integer.toString(binary));
+				System.out.println("While Loops: "+ Integer.toString(whileLoop));
+				System.out.println("If Statements: " + Integer.toString(ifElse));
 			}
 
 			if (reporter.getNumErrors() == 0) {
